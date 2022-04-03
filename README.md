@@ -1,1 +1,1 @@
-# hac-flink
+# Hierarchical Agglomerative Clustering (HAC)
