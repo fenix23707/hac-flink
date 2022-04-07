@@ -16,12 +16,14 @@ public class SingleLinkage <T> extends Linkage<T>{
             for(T p2: b.getClusterElements()){
                 Pair<T,T> p = new Pair(p1,p2);
                 double dis =-1;
-                if(this.pairwise_distances.containsKey(p)){
-                    dis = pairwise_distances.get(p);
-                }else{
-                    dis = distancefunction.apply(p1,p2);
-                    pairwise_distances.put(p,dis);
-                }
+                dis = distancefunction.apply(p1,p2);
+
+//                if(this.pairwise_distances.containsKey(p)){
+//                    dis = pairwise_distances.get(p);
+//                }else{
+//                    dis = distancefunction.apply(p1,p2);
+//                    pairwise_distances.put(p,dis);
+//                }
 
                 if(dis<min)
                     min = dis;

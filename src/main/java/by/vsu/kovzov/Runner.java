@@ -3,39 +3,24 @@ package by.vsu.kovzov;
 import by.vsu.kovzov.linkage.Linkage;
 import by.vsu.kovzov.linkage.SingleLinkage;
 import by.vsu.kovzov.model.Cluster;
-import org.apache.flink.api.common.aggregators.Aggregator;
-import org.apache.flink.api.common.aggregators.DoubleSumAggregator;
 import org.apache.flink.api.common.functions.FlatJoinFunction;
 import org.apache.flink.api.common.functions.MapFunction;
-import org.apache.flink.api.common.serialization.SimpleStringEncoder;
+import org.apache.flink.api.common.functions.ReduceFunction;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.flink.api.java.functions.KeySelector;
 import org.apache.flink.api.java.operators.IterativeDataSet;
-import org.apache.flink.api.java.summarize.aggregation.ObjectSummaryAggregator;
-import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.flink.api.java.tuple.Tuple5;
 import org.apache.flink.api.java.utils.ParameterTool;
-import org.apache.flink.configuration.MemorySize;
-import org.apache.flink.connector.file.sink.FileSink;
-import org.apache.flink.core.fs.Path;
-import org.apache.flink.streaming.api.datastream.DataStream;
-import org.apache.flink.streaming.api.datastream.IterativeStream;
-import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
-import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
-import org.apache.flink.streaming.api.functions.ProcessFunction;
-import org.apache.flink.streaming.api.functions.sink.filesystem.rollingpolicies.DefaultRollingPolicy;
-import org.apache.flink.streaming.api.functions.source.SourceFunction;
 import org.apache.flink.util.Collector;
 import org.apache.flink.util.OutputTag;
 
-import java.time.Duration;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Random;
 
 public class Runner {
+    //TODO: add thread safe here
     private static final Linkage<Double> LINKAGE = new SingleLinkage<>((aDouble, aDouble2) -> Math.abs(aDouble - aDouble2));
     private static final int BOUND = 100;
 
@@ -69,7 +54,7 @@ public class Runner {
 
         IterativeDataSet<Cluster> iteration = clusters.iterate(Integer.MAX_VALUE);
 
-        DataSet<Tuple3<Cluster, Cluster, Double>> clustersWithDist = iteration.fullOuterJoin(clusters)
+        DataSet<Tuple3<Cluster, Cluster, Double>> clustersWithDist = iteration.join(iteration)
                 .where(value -> true)
                 .equalTo(value -> true)
                 .with(new FlatJoinFunction<Cluster, Cluster, Tuple3<Cluster, Cluster, Double>>() {
@@ -82,25 +67,53 @@ public class Runner {
                 })
                 .distinct(value -> value.f0.id + value.f1.id);
 
-        DataSet<Tuple3<Cluster, Cluster, Double>> min = clustersWithDist
-                .min(2);
-        DataSet<Cluster> step = clustersWithDist.rightOuterJoin(min)
-                .where(value -> true)
-                .equalTo(value -> true)
-                .with(new FlatJoinFunction<Tuple3<Cluster, Cluster, Double>, Tuple3<Cluster, Cluster, Double>, Cluster>() {
+        DataSet<Cluster> min = clustersWithDist
+                .map(new MapFunction<Tuple3<Cluster, Cluster, Double>, Tuple3<Cluster, Cluster, Double>>() {
                     @Override
-                    public void join(Tuple3<Cluster, Cluster, Double> c, Tuple3<Cluster, Cluster, Double> p, Collector<Cluster> out) throws Exception {
-                        if (!(p.f0 == c.f0 || p.f0 == c.f1 || p.f1 == c.f1 || p.f1 == c.f0)) {
-                            out.collect(p.f0);
+                    public Tuple3<Cluster, Cluster, Double> map(Tuple3<Cluster, Cluster, Double> value) throws Exception {
+                        System.out.println("distances: " + value);
+                        return value;
+                    }
+                })
+                .reduce(new ReduceFunction<Tuple3<Cluster, Cluster, Double>>() {
+                    @Override
+                    public Tuple3<Cluster, Cluster, Double> reduce(Tuple3<Cluster, Cluster, Double> value1, Tuple3<Cluster, Cluster, Double> value2) throws Exception {
+                        return value1.f2 < value2.f2 ? value1 : value2;
+                    }
+                })
+                .map(new MapFunction<Tuple3<Cluster, Cluster, Double>, Cluster>() {
+                    @Override
+                    public Cluster map(Tuple3<Cluster, Cluster, Double> value) throws Exception {
+                        System.out.println("min: " + value);
+                        return new Cluster(value.f0, value.f1, value.f2);
+                    }
+                });
+        DataSet<Cluster> step = clustersWithDist.join(min)
+                .where(new KeySelector<Tuple3<Cluster, Cluster, Double>, Boolean>() {
+                    @Override
+                    public Boolean getKey(Tuple3<Cluster, Cluster, Double> value) throws Exception {
+                        return true;
+                    }
+                })
+                .equalTo(new KeySelector<Cluster, Boolean>() {
+                    @Override
+                    public Boolean getKey(Cluster value) throws Exception {
+                        return true;
+                    }
+                })
+                .with(new FlatJoinFunction<Tuple3<Cluster, Cluster, Double>, Cluster, Cluster>() {
+                    @Override
+                    public void join(Tuple3<Cluster, Cluster, Double> c, Cluster p, Collector<Cluster> out) throws Exception {
+                        if (!c.f0.equals(p.left_child) && !c.f0.equals(p.right_child)) {
+                            out.collect(c.f0);
                         }
-                        if (p.equals(c)) {
-                        } else {
-                            out.collect(new Cluster(p.f0, p.f1, p.f2));
-
+                        if (!c.f1.equals(p.left_child) && !c.f1.equals(p.right_child)) {
+                            out.collect(c.f1);
                         }
                     }
                 })
                 .distinct(value -> value.id)
+                .union(min)
                 .map(new MapFunction<Cluster, Cluster>() {
                     @Override
                     public Cluster map(Cluster value) throws Exception {
@@ -120,7 +133,7 @@ public class Runner {
                         return value;
                     }
                 })
-                .filter(value -> value > 2);
+                .filter(value -> value < 4);
 
         DataSet result = iteration.closeWith(step, termination);
 
