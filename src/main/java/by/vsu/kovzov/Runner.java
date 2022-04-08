@@ -41,7 +41,7 @@ public class Runner {
         ExecutionEnvironment env =
                 ExecutionEnvironment.getExecutionEnvironment();
 
-        DataSet<Double> input = env.fromCollection(Arrays.asList(2d, 3d, 9d));
+        DataSet<Double> input = env.fromCollection(Arrays.asList(73d,23d,43d,62d,63d,32d,85d,48d,22d,95d,94d,37d,74d,11d,72d,16d,92d,65d,18d,68d,19d,67d,27d,25d,50d,28d,91d,44d,76d,55d,78d,9d,81d,56d,77d,17d,57d,70d,15d,26d,86d,59d,39d,51d,33d,12d,58d,35d,93d,36d,46d,98d,97d,75d,41d,96d,69d,7d,49d,90d,31d,100d,60d,52d,2d,54d,10d,47d,71d,99d,6d,83d,13d,82d,8d,3d,53d,5d,34d,14d,87d,24d,30d,20d,88d,84d,1d,38d,89d,80d,45d,29d,21d,61d,4d,40d,66d,42d,64d,79d));
         DataSet<Cluster> clusters = input.map(new MapFunction<Double, Cluster>() {
             @Override
             public Cluster map(Double value) throws Exception {
@@ -71,7 +71,7 @@ public class Runner {
                 .map(new MapFunction<Tuple3<Cluster, Cluster, Double>, Tuple3<Cluster, Cluster, Double>>() {
                     @Override
                     public Tuple3<Cluster, Cluster, Double> map(Tuple3<Cluster, Cluster, Double> value) throws Exception {
-                        System.out.println("distances: " + value);
+//                        System.out.println("distances: " + value);
                         return value;
                     }
                 })
@@ -84,7 +84,7 @@ public class Runner {
                 .map(new MapFunction<Tuple3<Cluster, Cluster, Double>, Cluster>() {
                     @Override
                     public Cluster map(Tuple3<Cluster, Cluster, Double> value) throws Exception {
-                        System.out.println("min: " + value);
+//                        System.out.println("min: " + value);
                         return new Cluster(value.f0, value.f1, value.f2);
                     }
                 });
@@ -117,7 +117,7 @@ public class Runner {
                 .map(new MapFunction<Cluster, Cluster>() {
                     @Override
                     public Cluster map(Cluster value) throws Exception {
-                        System.out.println(value);
+//                        System.out.println(value);
                         return value;
                     }
                 });
@@ -133,13 +133,13 @@ public class Runner {
                         return value;
                     }
                 })
-                .filter(value -> value < 4);
+                .filter(value -> value > 2);
 
         DataSet result = iteration.closeWith(step, termination);
 
 //        result.print();
         List list = result.collect();
-//        System.out.println(list);
+        System.out.println(list);
 
 //        DataSet<Integer> test = env.fromCollection(Arrays.asList(1));
 //        System.out.println(test.reduce((value1, value2) -> value1 + value2).collect());
