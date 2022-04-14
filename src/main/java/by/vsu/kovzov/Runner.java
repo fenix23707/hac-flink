@@ -13,7 +13,6 @@ import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.flink.api.java.operators.IterativeDataSet;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.flink.api.java.utils.ParameterTool;
-import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.util.Collector;
 
 import java.util.Arrays;
@@ -71,10 +70,10 @@ public class Runner {
                 .with(new FlatJoinFunction<Tuple3<Cluster, Cluster, Double>, Cluster, Cluster>() {
                     @Override
                     public void join(Tuple3<Cluster, Cluster, Double> c, Cluster p, Collector<Cluster> out) throws Exception {
-                        if (!c.f0.equals(p.left_child) && !c.f0.equals(p.right_child)) {
+                        if (!c.f0.equals(p.leftChild) && !c.f0.equals(p.rightChild)) {
                             out.collect(c.f0);
                         }
-                        if (!c.f1.equals(p.left_child) && !c.f1.equals(p.right_child)) {
+                        if (!c.f1.equals(p.leftChild) && !c.f1.equals(p.rightChild)) {
                             out.collect(c.f1);
                         }
                     }

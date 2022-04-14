@@ -1,4 +1,5 @@
 package by.vsu.kovzov.model;
+
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.LinkedList;
@@ -6,50 +7,51 @@ import java.util.Random;
 
 /**
  * Object Representing a Cluster of generic type
+ *
  * @param <T> generic type
  */
 public class Cluster<T> implements Serializable {
     final static Random RANDOM = new Random();
     final public Long id = System.currentTimeMillis() + RANDOM.nextLong();
 
-    final public Cluster right_child;
-    final public Cluster left_child;
+    final public Cluster rightChild;
+    final public Cluster leftChild;
     final private T obj;
     private LinkedList<T> nested_objs = null;
 
     final public double distance;
-    final public int size;
 
     public Cluster(T obj) {
-        this.right_child=null;
-        this.left_child=null;
+        this.rightChild = null;
+        this.leftChild = null;
         this.obj = obj;
-        this.size = 1;
-        this.distance=0;
+        this.distance = 0;
     }
 
-    public Cluster(Cluster rightchild, Cluster leftchild, double distance) {
-        this.right_child = rightchild;
-        this.left_child = leftchild;
+    public Cluster(Cluster rightChild, Cluster leftChild, double distance) {
+        this.rightChild = rightChild;
+        this.leftChild = leftChild;
         this.obj = null;
         this.distance = distance;
-        this.size = size();
-
     }
 
     /**
      * @return elements of nested clusters
      */
     public Collection<T> getClusterElements() {
-        if(nested_objs!=null)
+        if (nested_objs != null) {
             return nested_objs;
+        }
         nested_objs = new LinkedList<>();
-        if (this.left_child != null)
-            nested_objs.addAll(this.left_child.getClusterElements());
-        if (this.right_child != null)
-            nested_objs.addAll(this.right_child.getClusterElements());
-        if (this.obj != null)
+        if (this.leftChild != null) {
+            nested_objs.addAll(this.leftChild.getClusterElements());
+        }
+        if (this.rightChild != null) {
+            nested_objs.addAll(this.rightChild.getClusterElements());
+        }
+        if (this.obj != null) {
             nested_objs.add(obj);
+        }
         return nested_objs;
     }
 
@@ -62,25 +64,18 @@ public class Cluster<T> implements Serializable {
             return false;
         }
         final Cluster other = (Cluster) obj;
-        if(this.distance == other.distance && this.size == other.size && this.getClusterElements().equals(other.getClusterElements()))
+        if (this.distance == other.distance && this.getClusterElements().equals(other.getClusterElements())) {
             return true;
+        }
         return false;
-    }
-
-    private int size() {
-        if (obj != null)
-            return 1;
-        else
-            return this.left_child.size() + this.right_child.size();
     }
 
     @Override
     public String toString() {
-        if (this.obj != null)
+        if (this.obj != null) {
             return obj.toString();
-        else
-            return "(" + left_child.toString() + " , " + right_child.toString() + ")";
+        } else {
+            return "(" + leftChild.toString() + " , " + rightChild.toString() + ")";
+        }
     }
-
-
 }

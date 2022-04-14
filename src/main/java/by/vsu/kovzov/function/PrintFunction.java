@@ -11,7 +11,7 @@ public class PrintFunction<T> implements MapFunction<T, T> {
 
     @Override
     public T map(T value) throws Exception {
-        System.out.println(info + " " + value);
+//        System.out.println(info + " " + value);
         return value;
     }
 }
