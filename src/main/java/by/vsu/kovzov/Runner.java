@@ -13,6 +13,7 @@ import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.flink.api.java.operators.IterativeDataSet;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.flink.api.java.utils.ParameterTool;
+import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.util.Collector;
 
 import java.util.Arrays;
@@ -32,8 +33,10 @@ public class Runner {
         // continuous flushing of the output buffers (lowest latency)
         ExecutionEnvironment env =
                 ExecutionEnvironment.getExecutionEnvironment();
+        env.setParallelism(1);
 
-        DataSet<Double> input = env.fromCollection(Arrays.asList(1d, 2d, 10d));
+        DataSet<Double> input = env.fromCollection(Arrays.asList(1d, 3d, 6d, 9d, 10d));
+
         DataSet<Cluster> clusters = input.map(new MapFunction<Double, Cluster>() {
             @Override
             public Cluster map(Double value) throws Exception {
@@ -42,7 +45,7 @@ public class Runner {
         });
         IterativeDataSet<Cluster> iteration = clusters.iterate(Integer.MAX_VALUE);
 
-        DataSet<Tuple3<Cluster, Cluster, Double>> clustersWithDist = iteration.join(iteration)
+        DataSet<Tuple3<Cluster, Cluster, Double>> clustersWithDist = iteration.joinWithHuge(iteration)
                 .where(value -> true)
                 .equalTo(value -> true)
                 .with(new FlatJoinFunction<Cluster, Cluster, Tuple3<Cluster, Cluster, Double>>() {
@@ -58,7 +61,9 @@ public class Runner {
         DataSet<Cluster> min = clustersWithDist
                 .map(new PrintFunction("distance:"))
                 .reduce(new MinFunction())
-                .map(new MergeFunction());
+                .name("find min")
+                .map(new MergeFunction())
+                .name("merge 2 clusters with min dist");
 
         DataSet<Cluster> step = clustersWithDist.join(min)
                 .where(value -> true)
@@ -74,6 +79,7 @@ public class Runner {
                         }
                     }
                 })
+                .name("calculate distances")
                 .distinct(value -> value.id)
                 .union(min)
                 .map(new PrintFunction<>("min: "));
