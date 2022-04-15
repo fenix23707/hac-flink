@@ -32,7 +32,6 @@ public class Runner {
         // continuous flushing of the output buffers (lowest latency)
         ExecutionEnvironment env =
                 ExecutionEnvironment.getExecutionEnvironment();
-        env.setParallelism(1);
 
         DataSet<Double> input = env.fromCollection(Arrays.asList(1d, 3d, 6d, 9d, 10d));
 
