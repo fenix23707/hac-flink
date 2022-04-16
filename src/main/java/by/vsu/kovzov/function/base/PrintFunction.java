@@ -1,4 +1,4 @@
-package by.vsu.kovzov.function;
+package by.vsu.kovzov.function.base;
 
 import org.apache.flink.api.common.functions.MapFunction;
 

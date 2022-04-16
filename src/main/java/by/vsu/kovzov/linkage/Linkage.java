@@ -1,17 +1,18 @@
 package by.vsu.kovzov.linkage;
 
 import by.vsu.kovzov.model.Cluster;
+import by.vsu.kovzov.model.SerializableBiFunction;
 
-import java.util.function.BiFunction;
+import java.io.Serializable;
 
-abstract public class Linkage<T> {
-    final BiFunction<T,T,Double> distanceFunction;
+abstract public class Linkage<T> implements Serializable {
+    final SerializableBiFunction<T,T,Double> distanceFunction;
 
     /**
      * Constructor
      * @param distanceFunction calc distance between to generic objects
      */
-    public Linkage(BiFunction<T,T,Double> distanceFunction){
+    public Linkage(SerializableBiFunction<T,T,Double> distanceFunction){
         this.distanceFunction = distanceFunction;
     }
 

@@ -1,11 +1,10 @@
 package by.vsu.kovzov.linkage;
 
 import by.vsu.kovzov.model.Cluster;
-
-import java.util.function.BiFunction;
+import by.vsu.kovzov.model.SerializableBiFunction;
 
 public class SingleLinkage <T> extends Linkage<T>{
-    public SingleLinkage(BiFunction<T, T, Double> distanceFunction) {
+    public SingleLinkage(SerializableBiFunction<T, T, Double> distanceFunction) {
         super(distanceFunction);
     }
 
