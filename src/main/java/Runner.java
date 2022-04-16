@@ -1,8 +1,6 @@
-package by.vsu.kovzov;
-
-import by.vsu.kovzov.function.MergeFunction;
-import by.vsu.kovzov.function.MinFunction;
 import by.vsu.kovzov.function.PrintFunction;
+import by.vsu.kovzov.function.algorithm.MergeFunction;
+import by.vsu.kovzov.function.algorithm.MinFunction;
 import by.vsu.kovzov.linkage.Linkage;
 import by.vsu.kovzov.linkage.SingleLinkage;
 import by.vsu.kovzov.model.Cluster;
@@ -12,24 +10,17 @@ import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.flink.api.java.operators.IterativeDataSet;
 import org.apache.flink.api.java.tuple.Tuple3;
-import org.apache.flink.api.java.utils.ParameterTool;
 import org.apache.flink.util.Collector;
 
 import java.util.Arrays;
 import java.util.List;
 
 public class Runner {
-    //TODO: add thread safe here
     private static final Linkage<Double> LINKAGE = new SingleLinkage<>((aDouble, aDouble2) -> Math.abs(aDouble - aDouble2));
 
     public static void main(String[] args) throws Exception {
-        // Checking input parameters
-        final ParameterTool params = ParameterTool.fromArgs(args);
 
-        // set up input for the stream of integer pairs
 
-        // obtain execution environment and set setBufferTimeout to 1 to enable
-        // continuous flushing of the output buffers (lowest latency)
         ExecutionEnvironment env =
                 ExecutionEnvironment.getExecutionEnvironment();
 
@@ -94,8 +85,5 @@ public class Runner {
         List list = result.collect();
         System.out.println(list);
 
-//        DataSet<Integer> test = env.fromCollection(Arrays.asList(1));
-//        System.out.println(test.reduce((value1, value2) -> value1 + value2).collect());
-//        env.execute();
     }
 }

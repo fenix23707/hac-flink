@@ -1,7 +1,6 @@
 package by.vsu.kovzov.linkage;
 
 import by.vsu.kovzov.model.Cluster;
-import org.apache.commons.math3.util.Pair;
 
 import java.util.function.BiFunction;
 

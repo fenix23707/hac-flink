@@ -1,4 +1,4 @@
-package by.vsu.kovzov.function;
+package by.vsu.kovzov.function.algorithm;
 
 import by.vsu.kovzov.model.Cluster;
 import org.apache.flink.api.common.functions.ReduceFunction;
