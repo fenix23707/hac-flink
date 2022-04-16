@@ -1,8 +1,9 @@
 package by.vsu.kovzov.model;
 
+import java.io.Serializable;
 import java.util.Objects;
 
-public class Mark {
+public class Mark implements Serializable {
     private Integer id;
 
     private int value;

@@ -36,7 +36,7 @@ ext {
     slf4jVersion = '1.7.15'
     log4jVersion = '2.17.1'
     junitVersion = '5.7.0'
-    mybatisVersion = '3.5.9'
+    mybatisVersion = '3.5.6'
 }
 
 // declare the dependencies for your production and test code

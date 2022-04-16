@@ -1,9 +1,10 @@
 package by.vsu.kovzov.model;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.Objects;
 
-public class ReceivedMark {
+public class ReceivedMark implements Serializable {
     private Long id;
 
     private Mark mark;
