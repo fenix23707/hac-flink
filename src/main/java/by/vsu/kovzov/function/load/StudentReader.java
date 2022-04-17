@@ -6,7 +6,7 @@ import by.vsu.kovzov.repository.StudentRepository;
 import org.apache.flink.api.common.functions.RichMapFunction;
 import org.apache.flink.configuration.Configuration;
 
-public class ReadStudent extends RichMapFunction<Long, Student> {
+public class StudentReader extends RichMapFunction<Long, Student> {
     private transient StudentRepository studentRepository;
 
     @Override

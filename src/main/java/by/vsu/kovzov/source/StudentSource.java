@@ -1,8 +1,10 @@
 package by.vsu.kovzov.source;
 
 import by.vsu.kovzov.config.MyBatisConfig;
-import by.vsu.kovzov.function.load.EnrichStudent;
-import by.vsu.kovzov.function.load.StudentMapFunction;
+import by.vsu.kovzov.function.load.Deduplicator;
+import by.vsu.kovzov.function.load.StudentEnrichment;
+import by.vsu.kovzov.function.load.StudentReader;
+import by.vsu.kovzov.model.ReceivedMark;
 import by.vsu.kovzov.model.Student;
 import by.vsu.kovzov.repository.StudentRepository;
 import org.apache.flink.api.java.DataSet;
@@ -21,12 +23,15 @@ public class StudentSource extends Source<Student> {
     public DataSet<Student> getDataSet() {
         List<Long> ids = studentRepository.findAllId();
         DataSet<Long> dataSet = env.fromCollection(ids);
-        return dataSet
-                .map(new StudentMapFunction())
+
+        DataSet<Student> students = dataSet
+                .map(new StudentReader())
                 .name("read student by id")
-                .map(new EnrichStudent())
-                .name("enrich students");
+                .map(new StudentEnrichment())
+                .name("enrich student")
+                .map(new Deduplicator())
+                .name("remove duplicated marks by discipline");
 
-
+        return students;
     }
 }

@@ -10,7 +10,7 @@ import org.apache.flink.configuration.Configuration;
 
 import java.util.List;
 
-public class ReadReceivedMarkByStudentId extends RichMapFunction<Long, List<ReceivedMark>> {
+public class StudentEnrichment extends RichMapFunction<Student, Student> {
     private transient ReceivedMarkRepository receivedMarkRepository;
 
     @Override
@@ -19,7 +19,9 @@ public class ReadReceivedMarkByStudentId extends RichMapFunction<Long, List<Rece
     }
 
     @Override
-    public List<ReceivedMark> map(Long studentId) throws Exception {
-        return receivedMarkRepository.findAllByStudentId(studentId);
+    public Student map(Student student) throws Exception {
+        List<ReceivedMark> receivedMarks = receivedMarkRepository.findAllByStudentId(student.getId());
+        student.setReceivedMarks(receivedMarks);
+        return student;
     }
 }
