@@ -6,11 +6,16 @@
 <mapper namespace="by.vsu.kovzov.repository.ReceivedMarkRepository">
     <resultMap id="receivedMarkResultMap" type="ReceivedMark" autoMapping="true">
         <association property="mark" javaType="Mark" resultMap="markResultMap"/>
+        <association property="discipline" javaType="Discipline" resultMap="disciplineResultMap"/>
     </resultMap>
     <resultMap id="markResultMap" type="Mark">
         <id property="id" column="mark_id"/>
         <result property="value" column="value_int"/>
         <result property="valueStr" column="value_str"/>
         <result property="markScale" column="mark_scale"/>
+    </resultMap>
+
+    <resultMap id="disciplineResultMap" type="Discipline" autoMapping="true">
+        <id property="id" column="discipline_id"/>
     </resultMap>
 </mapper>

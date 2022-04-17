@@ -90,12 +90,13 @@ public class Student implements Serializable {
 
     @Override
     public String toString() {
-        return "Student{" +
+        return id.toString();
+       /* return "Student{" +
                 "id=" + id +
                 ", surname='" + surname + '\'' +
                 ", name='" + name + '\'' +
                 ", patronymic='" + patronymic + '\'' +
                 ", receivedMarks=" + receivedMarks +
-                '}';
+                '}';*/
     }
 }

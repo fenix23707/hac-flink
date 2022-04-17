@@ -10,6 +10,7 @@
     <typeAliases>
         <typeAlias type="by.vsu.kovzov.model.Student" alias="Student"/>
         <typeAlias type="by.vsu.kovzov.model.Mark" alias="Mark"/>
+        <typeAlias type="by.vsu.kovzov.model.Discipline" alias="Discipline"/>
         <typeAlias type="by.vsu.kovzov.model.ReceivedMark" alias="ReceivedMark"/>
     </typeAliases>
 
