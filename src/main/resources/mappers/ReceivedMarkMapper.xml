@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="by.vsu.kovzov.repository.ReceivedMarkRepository">
+    <resultMap id="receivedMarkResultMap" type="ReceivedMark" autoMapping="true">
+        <association property="mark" javaType="Mark" resultMap="markResultMap"/>
+    </resultMap>
+    <resultMap id="markResultMap" type="Mark">
+        <id property="id" column="mark_id"/>
+        <result property="value" column="value_int"/>
+        <result property="valueStr" column="value_str"/>
+        <result property="markScale" column="mark_scale"/>
+    </resultMap>
+</mapper>

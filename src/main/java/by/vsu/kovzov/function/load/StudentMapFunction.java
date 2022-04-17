@@ -7,7 +7,6 @@ import org.apache.flink.api.common.functions.RichMapFunction;
 import org.apache.flink.configuration.Configuration;
 
 public class StudentMapFunction extends RichMapFunction<Long, Student> {
-    //TODO: find way to serialize StudentRepository
     private transient StudentRepository studentRepository;
 
     @Override

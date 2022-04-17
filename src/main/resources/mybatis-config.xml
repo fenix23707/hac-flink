@@ -9,6 +9,8 @@
 
     <typeAliases>
         <typeAlias type="by.vsu.kovzov.model.Student" alias="Student"/>
+        <typeAlias type="by.vsu.kovzov.model.Mark" alias="Mark"/>
+        <typeAlias type="by.vsu.kovzov.model.ReceivedMark" alias="ReceivedMark"/>
     </typeAliases>
 
     <environments default="development">
@@ -25,6 +27,7 @@
 
     <mappers>
         <mapper resource="mappers/StudentMapper.xml"/>
+        <mapper resource="mappers/ReceivedMarkMapper.xml"/>
     </mappers>
 
 </configuration>

@@ -12,6 +12,7 @@ public class ReceivedMark implements Serializable {
     private Date date;
 
     public ReceivedMark() {
+        this.mark = new Mark();
     }
 
     public ReceivedMark(Mark mark, Date date) {
