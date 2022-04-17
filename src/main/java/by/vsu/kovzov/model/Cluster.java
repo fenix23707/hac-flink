@@ -5,12 +5,16 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.Random;
 
+import static by.vsu.kovzov.model.Constants.*;
+
 /**
  * Object Representing a Cluster of generic type
  *
  * @param <T> generic type
  */
 public class Cluster<T> implements Serializable {
+
+
     final static Random RANDOM = new Random();
     final public Long id = System.currentTimeMillis() + RANDOM.nextLong();
 
@@ -68,6 +72,27 @@ public class Cluster<T> implements Serializable {
             return true;
         }
         return false;
+    }
+
+    private void dump0(Cluster<T> node, String prefix, boolean root, boolean last) {
+        System.out.println(prefix
+                + (root ? "" : (last ? CH_UDIA_HOR : CH_VER_HOR))
+                + (node != null && node.obj != null ? node.obj : "")
+        );
+
+        if (node == null || (node.leftChild == null && node.rightChild == null)) {
+            return;
+        }
+
+        Cluster[] v = {node.leftChild, node.rightChild};
+
+        for (int i = 0; i < v.length; ++i) {
+            dump0(v[i], prefix + (root ? "" : (last ? "  " : CH_VER_SPA)), false, i + 1 >= v.length);
+        }
+    }
+
+    public void print() {
+        dump0(this, "", true, true);
     }
 
     @Override
