@@ -2,7 +2,6 @@
 
 #k8s:
 minikube-flink.yaml
-docker-compose.yml
 
 # IntelliJ IDEA
 *.idea
