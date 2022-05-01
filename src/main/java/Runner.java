@@ -19,6 +19,7 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 public class Runner {
+    public static final String mainDir = "/shared/";
 
     public static void main(String[] args) throws Exception {
 
@@ -57,16 +58,16 @@ public class Runner {
                 ExecutionEnvironment.getExecutionEnvironment();
 
 //        DataSet<Double> input = env.fromCollection(data);
-        DataSet<Double> input = env.fromCollection(Arrays.asList(1d, 3d, 10d));
+        DataSet<Double> input = env.fromCollection(Arrays.asList(1d, 3d, 6d, 9d, 10d, 11d));
 
         Linkage<Double> LINKAGE = new SingleLinkage<>((aDouble, aDouble2) -> Math.abs(aDouble - aDouble2));
         HacAlgorithm<Double> algorithm = new HacAlgorithm<>(input, LINKAGE);
 
         DataSet result = algorithm.start();
         List<Cluster> list = result.collect();
-//        list.get(0).print();
+        list.get(0).print();
         System.out.println(list);
-//        result.writeAsText("/shared/outputs");
+//        result.writeAsText(mainDir + parameterTool.get("output", "output"));
 //        env.execute();
     }
 }

@@ -1,15 +1,21 @@
 package by.vsu.kovzov;
 
 import by.vsu.kovzov.function.algorithm.*;
+import by.vsu.kovzov.function.base.PrintFunction;
 import by.vsu.kovzov.linkage.Linkage;
 import by.vsu.kovzov.model.Cluster;
+import org.apache.flink.api.common.functions.CrossFunction;
 import org.apache.flink.api.common.functions.GroupReduceFunction;
+import org.apache.flink.api.common.functions.ReduceFunction;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.operators.IterativeDataSet;
+import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.flink.util.Collector;
 
+import java.io.ObjectInputStream;
 import java.util.Iterator;
+import java.util.Objects;
 
 public class HacAlgorithm<T> {
     private DataSet<T> source;
@@ -26,12 +32,15 @@ public class HacAlgorithm<T> {
 
         IterativeDataSet<Cluster<T>> iteration = clusters.iterate(Integer.MAX_VALUE);
 
-        DataSet<Tuple3<Cluster<T>, Cluster<T>, Double>> clustersWithDist = iteration.join(iteration)
-                .where(value -> true)
-                .equalTo(value -> true)
-                .with(new DistanceCalculator<>(linkage))
-                .name("calculate dist")
-                .distinct(Tuple3::hashCode);
+        DataSet<Tuple3<Cluster<T>, Cluster<T>, Double>> clustersWithDist = iteration.cross(iteration)
+                .with(new CartesianProduct<T>())
+                .name("cartesian product on itself")
+                .filter(value -> !value.f1.equals( value.f0))
+                .name("delete pairs with equals clusters")
+                .distinct(Tuple2::hashCode)
+                .name("delete mirrored pairs")
+                .map(new DistanceCalculator<>(linkage))
+                .name("calculate dist");
 
         DataSet<Cluster<T>> min = clustersWithDist
                 .reduce(new MinFunction<T>())
