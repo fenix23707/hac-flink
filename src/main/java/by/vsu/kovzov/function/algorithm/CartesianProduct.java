@@ -2,7 +2,6 @@ package by.vsu.kovzov.function.algorithm;
 
 import by.vsu.kovzov.model.Cluster;
 import org.apache.flink.api.common.functions.CrossFunction;
-import org.apache.flink.api.java.tuple.Tuple;
 import org.apache.flink.api.java.tuple.Tuple2;
 
 public class CartesianProduct<T> implements CrossFunction<Cluster<T>, Cluster<T>, Tuple2<Cluster<T>, Cluster<T>>>{

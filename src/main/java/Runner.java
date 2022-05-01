@@ -57,17 +57,18 @@ public class Runner {
         ExecutionEnvironment env =
                 ExecutionEnvironment.getExecutionEnvironment();
 
-//        DataSet<Double> input = env.fromCollection(data);
-        DataSet<Double> input = env.fromCollection(Arrays.asList(1d, 3d, 6d, 9d, 10d, 11d));
+        DataSet<Double> input = env.fromCollection(data);
+//        DataSet<Double> input = env.fromCollection(Arrays.asList(1d, 3d, 6d, 9d, 10d, 11d));
 
         Linkage<Double> LINKAGE = new SingleLinkage<>((aDouble, aDouble2) -> Math.abs(aDouble - aDouble2));
         HacAlgorithm<Double> algorithm = new HacAlgorithm<>(input, LINKAGE);
 
         DataSet result = algorithm.start();
-        List<Cluster> list = result.collect();
-        list.get(0).print();
-        System.out.println(list);
-//        result.writeAsText(mainDir + parameterTool.get("output", "output"));
-//        env.execute();
+
+//        List<Cluster> list = result.collect();
+//        list.get(0).print();
+//        System.out.println(list);
+        result.writeAsText(mainDir + parameterTool.get("output", "output"));
+        env.execute();
     }
 }

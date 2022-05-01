@@ -1,21 +1,12 @@
 package by.vsu.kovzov;
 
 import by.vsu.kovzov.function.algorithm.*;
-import by.vsu.kovzov.function.base.PrintFunction;
 import by.vsu.kovzov.linkage.Linkage;
 import by.vsu.kovzov.model.Cluster;
-import org.apache.flink.api.common.functions.CrossFunction;
-import org.apache.flink.api.common.functions.GroupReduceFunction;
-import org.apache.flink.api.common.functions.ReduceFunction;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.operators.IterativeDataSet;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple3;
-import org.apache.flink.util.Collector;
-
-import java.io.ObjectInputStream;
-import java.util.Iterator;
-import java.util.Objects;
 
 public class HacAlgorithm<T> {
     private DataSet<T> source;
@@ -35,7 +26,7 @@ public class HacAlgorithm<T> {
         DataSet<Tuple3<Cluster<T>, Cluster<T>, Double>> clustersWithDist = iteration.cross(iteration)
                 .with(new CartesianProduct<T>())
                 .name("cartesian product on itself")
-                .filter(value -> !value.f1.equals( value.f0))
+                .filter(value -> !value.f1.equals(value.f0))
                 .name("delete pairs with equals clusters")
                 .distinct(Tuple2::hashCode)
                 .name("delete mirrored pairs")
@@ -57,22 +48,10 @@ public class HacAlgorithm<T> {
                 .union(min)
                 .name("add merged cluster");
 
-        DataSet<Integer> termination = iteration.first(3).reduceGroup(new GroupReduceFunction<Cluster<T>, Integer>() {
-            @Override
-            public void reduce(Iterable<Cluster<T>> values, Collector<Integer> out) throws Exception {
-                Iterator iterator = values.iterator();
-                if (iterator.hasNext()) {
-                    iterator.next();
-                }
-                if (iterator.hasNext()) {
-                    iterator.next();
-                }
-                if (iterator.hasNext()) {
-
-                    out.collect(1);
-                }
-            }
-        });
+        DataSet<Integer> termination = iteration
+                .first(3)
+                .reduceGroup(new TerminateFunction<>(2))
+                .name("terminate function");
 
         return iteration.closeWith(step, termination);
     }
