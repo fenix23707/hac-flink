@@ -4,7 +4,6 @@ import by.vsu.kovzov.config.MyBatisConfig;
 import by.vsu.kovzov.function.load.Deduplicator;
 import by.vsu.kovzov.function.load.StudentEnrichment;
 import by.vsu.kovzov.function.load.StudentReader;
-import by.vsu.kovzov.model.ReceivedMark;
 import by.vsu.kovzov.model.Student;
 import by.vsu.kovzov.repository.StudentRepository;
 import org.apache.flink.api.java.DataSet;

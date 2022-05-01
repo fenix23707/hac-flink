@@ -3,7 +3,7 @@ package by.vsu.kovzov.model;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.LinkedList;
-import java.util.Random;
+import java.util.Objects;
 
 import static by.vsu.kovzov.model.Constants.*;
 
@@ -14,16 +14,12 @@ import static by.vsu.kovzov.model.Constants.*;
  */
 public class Cluster<T> implements Serializable {
 
-
-    final static Random RANDOM = new Random();
-    final public Long id = System.currentTimeMillis() + RANDOM.nextLong();
-
     final public Cluster rightChild;
     final public Cluster leftChild;
     final private T obj;
-    private LinkedList<T> nested_objs = null;
+    private LinkedList<T> nestedObjs = null;
 
-    final public double distance;
+    final private double distance;
 
     public Cluster(T obj) {
         this.rightChild = null;
@@ -43,20 +39,20 @@ public class Cluster<T> implements Serializable {
      * @return elements of nested clusters
      */
     public Collection<T> getClusterElements() {
-        if (nested_objs != null) {
-            return nested_objs;
+        if (nestedObjs != null) {
+            return nestedObjs;
         }
-        nested_objs = new LinkedList<>();
+        nestedObjs = new LinkedList<>();
         if (this.leftChild != null) {
-            nested_objs.addAll(this.leftChild.getClusterElements());
+            nestedObjs.addAll(this.leftChild.getClusterElements());
         }
         if (this.rightChild != null) {
-            nested_objs.addAll(this.rightChild.getClusterElements());
+            nestedObjs.addAll(this.rightChild.getClusterElements());
         }
         if (this.obj != null) {
-            nested_objs.add(obj);
+            nestedObjs.add(obj);
         }
-        return nested_objs;
+        return nestedObjs;
     }
 
     @Override
@@ -72,6 +68,11 @@ public class Cluster<T> implements Serializable {
             return true;
         }
         return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(rightChild, leftChild, obj, nestedObjs, distance);
     }
 
     private void dump0(Cluster<T> node, String prefix, boolean root, boolean last) {

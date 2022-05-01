@@ -3,8 +3,6 @@ package by.vsu.kovzov.function.load;
 import by.vsu.kovzov.model.ReceivedMark;
 import by.vsu.kovzov.model.Student;
 import org.apache.flink.api.common.functions.MapFunction;
-import org.apache.flink.api.common.functions.ReduceFunction;
-import org.apache.hadoop.io.ByteWritable;
 
 import java.util.Comparator;
 import java.util.List;

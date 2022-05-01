@@ -23,12 +23,12 @@ public class HacAlgorithm <T> {
 
         IterativeDataSet<Cluster<T>> iteration = clusters.iterate(Integer.MAX_VALUE);
 
-        DataSet<Tuple3<Cluster<T>, Cluster<T>, Double>> clustersWithDist = iteration.joinWithHuge(iteration)
+        DataSet<Tuple3<Cluster<T>, Cluster<T>, Double>> clustersWithDist = iteration.join(iteration)
                 .where(value -> true)
                 .equalTo(value -> true)
                 .with(new DistanceCalculator<>(linkage))
                 .name("calculate dist")
-                .distinct(value -> value.f0.id + value.f1.id);
+                .distinct(Tuple3::hashCode);
 
         DataSet<Cluster<T>> min = clustersWithDist
                 .reduce(new MinFunction<T>())
@@ -40,7 +40,7 @@ public class HacAlgorithm <T> {
                 .where(value -> true)
                 .equalTo(value -> true)
                 .with(new ClusterCleaner<T>())
-                .distinct(value -> value.id)
+                .distinct(Cluster::hashCode)
                 .name("clean after merge")
                 .union(min)
                 .name("add merged cluster");
