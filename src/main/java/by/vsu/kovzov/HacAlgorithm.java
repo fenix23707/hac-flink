@@ -1,14 +1,17 @@
 package by.vsu.kovzov;
 
 import by.vsu.kovzov.function.algorithm.*;
-import by.vsu.kovzov.function.base.PrintFunction;
 import by.vsu.kovzov.linkage.Linkage;
 import by.vsu.kovzov.model.Cluster;
+import org.apache.flink.api.common.functions.GroupReduceFunction;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.operators.IterativeDataSet;
 import org.apache.flink.api.java.tuple.Tuple3;
+import org.apache.flink.util.Collector;
 
-public class HacAlgorithm <T> {
+import java.util.Iterator;
+
+public class HacAlgorithm<T> {
     private DataSet<T> source;
 
     private Linkage<T> linkage;
@@ -45,11 +48,22 @@ public class HacAlgorithm <T> {
                 .union(min)
                 .name("add merged cluster");
 
-        DataSet<Integer> termination = iteration
-                .map(value -> 1)
-                .reduce((value1, value2) -> value1 + value2)
-                .map(new PrintFunction<>("count:"))
-                .filter(value -> value > 2);
+        DataSet<Integer> termination = iteration.first(3).reduceGroup(new GroupReduceFunction<Cluster<T>, Integer>() {
+            @Override
+            public void reduce(Iterable<Cluster<T>> values, Collector<Integer> out) throws Exception {
+                Iterator iterator = values.iterator();
+                if (iterator.hasNext()) {
+                    iterator.next();
+                }
+                if (iterator.hasNext()) {
+                    iterator.next();
+                }
+                if (iterator.hasNext()) {
+
+                    out.collect(1);
+                }
+            }
+        });
 
         return iteration.closeWith(step, termination);
     }

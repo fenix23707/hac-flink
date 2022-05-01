@@ -11,19 +11,19 @@ import by.vsu.kovzov.source.Source;
 import by.vsu.kovzov.source.StudentSource;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
+import org.apache.flink.api.java.utils.ParameterTool;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 public class Runner {
 
     public static void main(String[] args) throws Exception {
 
 //        main();
-        test();
+        test(args);
     }
 
     public static void main() throws Exception {
@@ -41,27 +41,32 @@ public class Runner {
         list.get(0).print();
     }
 
-    public static void test() throws Exception {
-        int size = 10_000;
-        List<Double> data = new ArrayList<>(size);
-//        Random random = new Random();
-//        for (int i = 0; i < size; i++) {
-//            data.add(random.nextDouble());
-//        }
+    public static void test(String[] args) throws Exception {
+        ParameterTool parameterTool = ParameterTool.fromArgs(args);
+
+        int size = parameterTool.getInt("size", 10);
+        Random random = new Random();
+
+        List<Double> data = IntStream.range(0, size)
+                .parallel()
+                .mapToDouble(operand -> random.nextDouble())
+                .boxed()
+                .collect(Collectors.toList());
 
         ExecutionEnvironment env =
                 ExecutionEnvironment.getExecutionEnvironment();
 
-        DataSet<Double> input = env.fromCollection(Arrays.asList(1d,3d,10d, 15d));
+//        DataSet<Double> input = env.fromCollection(data);
+        DataSet<Double> input = env.fromCollection(Arrays.asList(1d, 3d, 10d));
 
         Linkage<Double> LINKAGE = new SingleLinkage<>((aDouble, aDouble2) -> Math.abs(aDouble - aDouble2));
         HacAlgorithm<Double> algorithm = new HacAlgorithm<>(input, LINKAGE);
 
         DataSet result = algorithm.start();
-//        result.writeAsText("/shared/output");
         List<Cluster> list = result.collect();
-        list.get(0).print();
-//        System.out.println(list);
+//        list.get(0).print();
+        System.out.println(list);
+//        result.writeAsText("/shared/outputs");
 //        env.execute();
     }
 }
